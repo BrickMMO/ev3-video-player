@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV3 Video PLayer</title>
+</head>
+<body>
+
+<h1>EV3 Video Player</h1>
+
+<video width="320" height="240" controls id="video">
+</video>
+
+<p>
+    Videos by Pressmaster: 
+    <br>
+    <a href="https://www.pexels.com/video/drops-of-liquid-on-a-tray-to-be-use-as-samples-3195394/">
+    https://www.pexels.com/video/drops-of-liquid-on-a-tray-to-be-use-as-samples-3195394/
+</p>
+
+<script>
+
+(function () {
+
+    let time = Math.floor(Date.now() / 1000);
+    const myInterval = setInterval(nextVideo, 1000);
+
+    function nextVideo() {
+        
+        fetch('next.json', {cache: "reload"})
+            .then((response) => response.json())
+            .then((json) => {
+                
+                if(json.time > time)
+                {
+                    
+                    console.log(time);
+                    console.log(json.time);
+
+                    time = json.time;
+
+                    let video = document.getElementById('video');
+                    video.pause();
+                    video.replaceChildren();
+
+                    let source = document.createElement('source');                   
+                    source.setAttribute('src', 'video/' + json.video);
+                    source.setAttribute('type', 'video/mp4');
+
+                    video.appendChild(source);
+                    video.load();
+                    video.play();
+
+                }
+
+            });
+        
+    }
+
+})();
+
+</script>
+    
+</body>
+</html>
