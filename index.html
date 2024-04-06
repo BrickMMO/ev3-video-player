@@ -44,14 +44,17 @@
                     video.pause();
                     video.replaceChildren();
 
+                    video.addEventListener('loadeddata', function() {
+                        video.play();
+                    }, false);
+
                     let source = document.createElement('source');                   
                     source.setAttribute('src', 'video/' + json.video);
                     source.setAttribute('type', 'video/mp4');
 
                     video.appendChild(source);
                     video.load();
-                    video.play();
-
+                    
                 }
 
             });
