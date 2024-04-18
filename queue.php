@@ -2,8 +2,10 @@
 
 header('Content-Type: application/json; charset=utf-8');
 
-$filename = 'next.json';
-
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+// Validation
 if(!key_exists('next', $_GET))
 {
     http_response_code(500);
@@ -17,6 +19,21 @@ elseif(!isset($_GET['next']) or !$_GET['next'])
     exit;
 }
 
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+// Record button press
+$filename = 'results-'.date('Y').'-'.date('m').'-'.date('d').'.csv';
+$results = fopen($filename, "a+");
+$content = time().','.$_GET['next'].chr(13);
+fwrite($results, $content);
+fclose($results);
+
+// ********************************************************************************
+// ********************************************************************************
+// ********************************************************************************
+// Prepare next.json file
+$filename = 'next.json';
 $content = '{"time":"'.time().'","video":"'.$_GET['next'].'"}';
 
 if(!file_exists('video/'.$_GET['next']))
@@ -28,14 +45,14 @@ if(!file_exists('video/'.$_GET['next']))
 elseif (is_writable($filename)) 
 {
 
-    if (!$fp = fopen($filename, 'w')) 
+    if (!$next = fopen($filename, 'w')) 
     {
         http_response_code(500);
         die('{"error":"Cannot open file ('.$filename.')"}');
         exit;
     }
 
-    if (fwrite($fp, $content) === FALSE) 
+    if (fwrite($next, $content) === FALSE) 
     {
         http_response_code(500);
         die('{"error":"Cannot open file ('.$filename.')"}');
@@ -44,7 +61,7 @@ elseif (is_writable($filename))
 
     die('{"success":"File updated ('.$filename.')"}');
 
-    fclose($fp);
+    fclose($next);
 
 } 
 else 
