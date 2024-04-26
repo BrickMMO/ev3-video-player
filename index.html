@@ -9,19 +9,35 @@
 
 <h1>EV3 Video Player</h1>
 
-<video width="320" height="240" controls id="video">
+<video width="640" height="480" controls id="video">
 </video>
 
-<p>
-    Videos by Pressmaster: 
-    <br>
-    <a href="https://www.pexels.com/video/drops-of-liquid-on-a-tray-to-be-use-as-samples-3195394/">
-    https://www.pexels.com/video/drops-of-liquid-on-a-tray-to-be-use-as-samples-3195394/
-</p>
+<div id="buttons"></div>
 
 <script>
 
 (function () {
+
+    const videos = ["argonaut.mp4","biodextris.mp4","joinn.mp4","scorpius.mp4","wheeler.mp4"];
+    buttons = document.getElementById('buttons');
+
+    videos.forEach((video) => {
+
+        let button = document.createElement('button');
+        button.textContent = video;
+        buttons.appendChild(button);
+
+        button.addEventListener('click', (e) => {
+            
+            let video = e.target.textContent;
+
+            const response = fetch('/queue.php?next=' + video, {
+                method: 'GET'
+            });
+
+        });
+
+    });
 
     let time = Math.floor(Date.now() / 1000);
     const myInterval = setInterval(nextVideo, 1000);
