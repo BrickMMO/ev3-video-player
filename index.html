@@ -1,85 +1,112 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EV3 Video PLayer</title>
-</head>
-<body>
 
-<h1>EV3 Video Player</h1>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css" />
+  </head>
+  <body>
+    <div class="w3-container">
+      <h1>EV3 Video Player</h1>
+    </div>
 
-<video width="640" height="480" controls id="video">
-</video>
+    <div class="w3-container">
+      <video
+        width="640"
+        height="480"
+        controls
+        id="video"
+        class="w3-border"
+      ></video>
+    </div>
 
-<div id="buttons"></div>
+    <div class="w3-container w3-bar" id="buttons"></div>
 
-<script>
+    <div class="w3-container" id="skip">
+      <input class="w3-check" type="checkbox" checked="checked" />
+      <label>Finish video before playing next</label>
+    </div>
 
-(function () {
+    <div class="w3-container">
+      <h2>Status: <span id="status"></span></h2>
+    </div>
 
-    const videos = ["argonaut.mp4","biodextris.mp4","joinn.mp4","scorpius.mp4","wheeler.mp4"];
-    buttons = document.getElementById('buttons');
+    <script>
+      (function () {
+        const videos = [
+          "argonaut.mp4",
+          "biodextris.mp4",
+          "joinn.mp4",
+          "scorpius.mp4",
+          "wheeler.mp4",
+        ];
+        buttons = document.getElementById("buttons");
 
-    videos.forEach((video) => {
+        videos.forEach((video) => {
+          let button = document.createElement("button");
+          button.textContent = video;
+          button.classList.add("w3-button");
+          button.classList.add("w3-red");
+          button.classList.add("w3-margin-right");
+          buttons.appendChild(button);
 
-        let button = document.createElement('button');
-        button.textContent = video;
-        buttons.appendChild(button);
-
-        button.addEventListener('click', (e) => {
-            
+          button.addEventListener("click", (e) => {
             let video = e.target.textContent;
 
-            const response = fetch('/queue.php?next=' + video, {
-                method: 'GET'
+            const response = fetch("/queue.php?next=" + video, {
+              method: "GET",
             });
-
+          });
         });
 
-    });
+        let status = document.getElementById("status");
+        let time = Math.floor(Date.now() / 1000);
+        let video = document.getElementById("video");
+        let videoStatus = false;
+        const myInterval = setInterval(nextVideo, 1000);
 
-    let time = Math.floor(Date.now() / 1000);
-    const myInterval = setInterval(nextVideo, 1000);
+        video.addEventListener(
+          "loadeddata",
+          function () {
+            video.play();
+            status.innerHTML = "PLAYING";
+            videoStatus = true;
+          },
+          false
+        );
 
-    function nextVideo() {
-        
-        fetch('next.json', {cache: "reload"})
+        video.addEventListener("ended", function () {
+          status.innerHTML = "FINISHED";
+          videoStatus = false;
+        });
+
+        function nextVideo() {
+          fetch("next.json", {cache: "reload"})
             .then((response) => response.json())
             .then((json) => {
-                
-                if(json.time > time)
-                {
-                    
-                    console.log(time);
-                    console.log(json.time);
+              if (json.time > time) {
+                time = json.time;
 
-                    time = json.time;
+                if (videoStatus == false) {
+                  console.log(time);
+                  console.log(json.time);
 
-                    let video = document.getElementById('video');
-                    video.pause();
-                    video.replaceChildren();
+                  video.pause();
+                  video.replaceChildren();
 
-                    video.addEventListener('loadeddata', function() {
-                        video.play();
-                    }, false);
+                  let source = document.createElement("source");
+                  source.setAttribute("src", "video/" + json.video);
+                  source.setAttribute("type", "video/mp4");
 
-                    let source = document.createElement('source');                   
-                    source.setAttribute('src', 'video/' + json.video);
-                    source.setAttribute('type', 'video/mp4');
-
-                    video.appendChild(source);
-                    video.load();
-                    
+                  video.appendChild(source);
+                  video.load();
                 }
-
+              }
             });
-        
-    }
-
-})();
-
-</script>
-    
-</body>
+        }
+      })();
+    </script>
+  </body>
 </html>
