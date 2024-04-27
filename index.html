@@ -24,8 +24,8 @@
 
     <div class="w3-container w3-bar" id="buttons"></div>
 
-    <div class="w3-container" id="skip">
-      <input class="w3-check" type="checkbox" checked="checked" />
+    <div class="w3-container">
+      <input class="w3-check" type="checkbox" checked="checked" id="prevent" />
       <label>Finish video before playing next</label>
     </div>
 
@@ -61,10 +61,14 @@
           });
         });
 
+        let prevent = document.getElementById("prevent");
+        let preventStatus = true;
         let status = document.getElementById("status");
+        let videoStatus = false;
+
         let time = Math.floor(Date.now() / 1000);
         let video = document.getElementById("video");
-        let videoStatus = false;
+        
         const myInterval = setInterval(nextVideo, 1000);
 
         video.addEventListener(
@@ -76,6 +80,10 @@
           },
           false
         );
+
+        prevent.addEventListener("click", function () {
+          preventStatus = this.checked;
+        });
 
         video.addEventListener("ended", function () {
           status.innerHTML = "FINISHED";
@@ -89,7 +97,7 @@
               if (json.time > time) {
                 time = json.time;
 
-                if (videoStatus == false) {
+                if (videoStatus == false || preventStatus == false) {
                   console.log(time);
                   console.log(json.time);
 
