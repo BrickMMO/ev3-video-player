@@ -19,6 +19,7 @@
         controls
         id="video"
         class="w3-border"
+        poster="images/thumb.jpg"
       ></video>
     </div>
 
@@ -42,6 +43,9 @@
           "scorpius.mp4",
           "wheeler.mp4",
         ];
+
+        const commercials = ["commercial-1.mp4", "commercial-2.mp4"];
+
         buttons = document.getElementById("buttons");
 
         videos.forEach((video) => {
@@ -65,10 +69,13 @@
         let preventStatus = true;
         let status = document.getElementById("status");
         let videoStatus = false;
+        let commercialStatus = false;
 
         let time = Math.floor(Date.now() / 1000);
         let video = document.getElementById("video");
-        
+
+        let commercialCounter = 0;
+
         const myInterval = setInterval(nextVideo, 1000);
 
         video.addEventListener(
@@ -76,7 +83,6 @@
           function () {
             video.play();
             status.innerHTML = "PLAYING";
-            videoStatus = true;
           },
           false
         );
@@ -88,18 +94,31 @@
         video.addEventListener("ended", function () {
           status.innerHTML = "FINISHED";
           videoStatus = false;
+          commercialStatus = false;
+          commercialCounter = 0;
+          video.currentTime = 0;
+          video.innerHTML = "";
+          video.load();
         });
 
         function nextVideo() {
           fetch("next.json", {cache: "reload"})
             .then((response) => response.json())
             .then((json) => {
+              console.log("checking");
+
               if (json.time > time) {
                 time = json.time;
 
+                console.log("Playing");
+
                 if (videoStatus == false || preventStatus == false) {
-                  console.log(time);
-                  console.log(json.time);
+                  console.log("Played");
+
+                  // console.log(time);
+                  // console.log(json.time);
+
+                  commercialStatus = false;
 
                   video.pause();
                   video.replaceChildren();
@@ -110,7 +129,32 @@
 
                   video.appendChild(source);
                   video.load();
+
+                  videoStatus = true;
                 }
+              } else if (
+                videoStatus == false &&
+                commercialStatus == false &&
+                commercialCounter > 10
+              ) {
+                let random = Math.floor(Math.random() * 2);
+
+                commercialStatus = true;
+
+                video.pause();
+                video.replaceChildren();
+
+                let source = document.createElement("source");
+                source.setAttribute(
+                  "src",
+                  "commercials/" + commercials[random]
+                );
+                source.setAttribute("type", "video/mp4");
+
+                video.appendChild(source);
+                video.load();
+              } else {
+                commercialCounter++;
               }
             });
         }
